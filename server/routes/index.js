@@ -3,9 +3,12 @@ const router = express.Router();
 const speakersRoute = require('./speakers');
 const feedbackRoute = require('./feedback');
 
+
+// ### this file handles all of our routes
+// this used to be a hello world
 module.exports = () => {
     router.get('/', (req, res, next) => {
-        return res.send("Hello World Index!");
+        return res.render('index.pug');
     });
 
     // middleware? 
