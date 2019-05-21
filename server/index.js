@@ -31,7 +31,7 @@ app.use((req, res, next) => {
     return next(createError(404, 'File not found'));
 });
 
-// error 
+// error , pug uses the status and error from here
 app.use((err, req, res, next) => {
     // displays locals message
     res.locals.message = err.message;
