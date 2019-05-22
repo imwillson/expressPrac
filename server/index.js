@@ -3,6 +3,14 @@ const app = express();
 const createError = require('http-errors');
 const routes = require('./routes'); // automatic index
 const path = require('path'); // what is path? 
+const configs = require('./config') // configuraiton file! 
+
+const config = configs[app.get('env')] // loads the environment 
+
+//services /json
+const SpeakerService = require('./services/SpeakerService');
+// draws from the config file
+const speakerService = new SpeakerService(config.data.speakers);
 
 //pug, then we have to tell it where to look for template, create a new folder called views, insider
 //inside server bc it has to b on the server lmfao? not clicnet
@@ -13,8 +21,20 @@ if(app.get('env') === 'development') {
     app.locals.pretty = true;
 }
 
+
 //sets the new views into views directory folder
 app.set('views', path.join(__dirname, './views'));
+
+
+// title dilemma
+app.locals.title = config.sitename; //refer above for config env 
+// sets the title default. + the configuration file! 
+
+app.use((req,res,next) => {
+    res.locals.rendertime = new Date();
+    return next() // must ALWAYS use next, so it doens't hang. 
+});
+
 //middleware!! 
 // routes
 
@@ -23,8 +43,27 @@ app.use(express.static('public'));
 app.get('/favicon.ico', (req,res,next) => {
     return res.sendStatus(204);
 });
+
+// add middlewar efo rhandling json. after the express static because 
+// those files wiwll never change. u don't need to run them there
+app.use(async (req,res,next) => {
+    try {
+        const names = await speakerService.getNames();
+        // console.log(names);
+        // create a new var speakerNames
+        res.locals.speakerNames = names;
+        return next();
+    } catch(err) {
+         return next(err);
+    }
+});
+
 // connects to the routes file
-app.use('/',routes());
+// can add param to routes now
+//THIS SI WHERE WE CONNECT THE SPEAKER SERVICE TO THE INDEX 
+app.use('/',routes({
+    speakerService: speakerService
+}));
 
 // error
 app.use((req, res, next) => {

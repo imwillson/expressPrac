@@ -6,15 +6,32 @@ const feedbackRoute = require('./feedback');
 
 // ### this file handles all of our routes
 // this used to be a hello world
-module.exports = () => {
-    router.get('/', (req, res, next) => {
-        return res.render('index.pug');
+//the added param means that you can give the routes file something
+module.exports = (param) => {
+
+    // will pull the properties out of param
+    // deconstruct it at assign to speakersErvice object, gotta
+    // pass in ur param
+    const { speakerService } = param;
+
+    router.get('/', async (req, res, next) => {
+        
+        const speakerslist = await speakerService.getListShort();
+        // console.log(speakerslist)
+
+        return res.render('index.pug', {
+            //every time this index file is rendered, we will
+            //have a varaible page set to Home to use!
+            page: 'Home',
+            speakerslist,
+        });
     });
 
     // middleware? 
     // so localhost:3000/speakers/:name
-    router.use('/speakers', speakersRoute());
-    router.use('/feedback', feedbackRoute());
+    // this is where you pass in the param 
+    router.use('/speakers', speakersRoute(param));
+    router.use('/feedback', feedbackRoute(param));
 
     return router;
 };
