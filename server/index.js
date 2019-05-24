@@ -18,7 +18,7 @@ app.set('view engine', 'pug');
 
 //not sure
 if(app.get('env') === 'development') {
-    app.locals.pretty = true;
+		app.locals.pretty = true;
 }
 
 
@@ -31,8 +31,8 @@ app.locals.title = config.sitename; //refer above for config env
 // sets the title default. + the configuration file! 
 
 app.use((req,res,next) => {
-    res.locals.rendertime = new Date();
-    return next() // must ALWAYS use next, so it doens't hang. 
+		res.locals.rendertime = new Date();
+		return next() // must ALWAYS use next, so it doens't hang. 
 });
 
 //middleware!! 
@@ -41,44 +41,46 @@ app.use((req,res,next) => {
 // connects static files to public
 app.use(express.static('public'));
 app.get('/favicon.ico', (req,res,next) => {
-    return res.sendStatus(204);
+		return res.sendStatus(204);
 });
+
+//### next 2 app.use gives the data in by calling it 
 
 // add middlewar efo rhandling json. after the express static because 
 // those files wiwll never change. u don't need to run them there
 app.use(async (req,res,next) => {
-    try {
-        const names = await speakerService.getNames();
-        // console.log(names);
-        // create a new var speakerNames
-        res.locals.speakerNames = names;
-        return next();
-    } catch(err) {
-         return next(err);
-    }
+		try {
+				const names = await speakerService.getNames();
+				// console.log(names);
+				// create a new var speakerNames
+				res.locals.speakerNames = names;
+				return next();
+		} catch(err) {
+				 return next(err);
+		}
 });
 
 // connects to the routes file
 // can add param to routes now
 //THIS SI WHERE WE CONNECT THE SPEAKER SERVICE TO THE INDEX 
 app.use('/',routes({
-    speakerService: speakerService
+		speakerService: speakerService
 }));
 
 // error
 app.use((req, res, next) => {
-    return next(createError(404, 'File not found'));
+		return next(createError(404, 'File not found'));
 });
 
 // error , pug uses the status and error from here
 app.use((err, req, res, next) => {
-    // displays locals message
-    res.locals.message = err.message;
-    const status = err.status || 500;
-    res.locals.status = status;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-    res.status(status);
-    return res.render('error');
+		// displays locals message
+		res.locals.message = err.message;
+		const status = err.status || 500;
+		res.locals.status = status;
+		res.locals.error = req.app.get('env') === 'development' ? err : {};
+		res.status(status);
+		return res.render('error');
 });
 
 // app.get('/', (req, res,next)  => {
@@ -86,7 +88,7 @@ app.use((err, req, res, next) => {
 // });
 
 app.listen(3000, () => {
-    console.log("Server started")
+		console.log("Server started")
 });
 
 module.exports = app 
