@@ -60,6 +60,7 @@ module.exports = (param) => {
                 artwork: promisesResult[1]
             })
         // follows the folder director
+        // adjust the link inside the pug page.
 
         
         } catch(err) {
