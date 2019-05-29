@@ -3,14 +3,19 @@ const app = express();
 const createError = require('http-errors');
 const routes = require('./routes'); // automatic index
 const path = require('path'); // what is path? 
+const bodyParser = require('body-parser');
 const configs = require('./config') // configuraiton file! 
 
 const config = configs[app.get('env')] // loads the environment 
 
 //services /json
 const SpeakerService = require('./services/SpeakerService');
+const FeedbackService = require('./services/FeedbackService');
 // draws from the config file
+// DRAWS FROM THE CONFIG FILE configfile.data.PATHOFFILENAME
 const speakerService = new SpeakerService(config.data.speakers);
+const feedbackService = new FeedbackService(config.data.feedback);
+// after creating this variable.. how do you use it? pass it in thru app use
 
 //pug, then we have to tell it where to look for template, create a new folder called views, insider
 //inside server bc it has to b on the server lmfao? not clicnet
@@ -40,6 +45,12 @@ app.use((req,res,next) => {
 
 // connects static files to public
 app.use(express.static('public'));
+
+
+// put body parser after static files, ud ont want it to run for those
+app.use(bodyParser.urlencoded({ extended: true }))
+// if it finds that variables are being stored on data through a RQEUEStr, it will parse it
+
 app.get('/favicon.ico', (req,res,next) => {
 		return res.sendStatus(204);
 });
@@ -64,7 +75,9 @@ app.use(async (req,res,next) => {
 // can add param to routes now
 //THIS SI WHERE WE CONNECT THE SPEAKER SERVICE TO THE INDEX 
 app.use('/',routes({
-		speakerService: speakerService
+		// speakerService: speakerService
+		speakerService,
+		feedbackService
 }));
 
 // error
